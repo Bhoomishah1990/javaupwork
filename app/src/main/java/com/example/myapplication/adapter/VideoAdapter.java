@@ -38,13 +38,24 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         isLoading = loading;
     }
 
+    public void loadMoreLoading() {
+        isLoading = true;
+        notifyDataSetChanged();
+    }
+
     public VideoAdapter(Context appcontext) {
         adapterContext = appcontext;
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setVideoList(List<ApiResult> videoList) {
-        this.videoList = new ArrayList<>(videoList);
+        this.videoList.addAll(new ArrayList<>(videoList));
+        isLoading = false;
+        notifyDataSetChanged();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setVideoListWithEnd() {
         isLoading = false;
         notifyDataSetChanged();
     }
@@ -69,12 +80,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
-        if (isLoading()) {
-            holder.binding.videoImage.startLoading();
-            holder.binding.tvCategory.startLoading();
-            holder.binding.videoName.startLoading();
-        } else {
+        if (position < videoList.size()) {
             Glide.with(holder.itemView)
                     .load("https:" + videoList.get(position).mainThumb)
                     .placeholder(com.example.myapplication.R.drawable.ic_launcher_background)
@@ -100,6 +106,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                 i.putExtra(Utils.EXT_OBJ, videoList.get(position));
                 adapterContext.startActivity(i);
             });
+        }
+        if (isLoading()) {
+            holder.binding.videoImage.startLoading();
+            holder.binding.tvCategory.startLoading();
+            holder.binding.videoName.startLoading();
+        } else {
+
 
             holder.binding.tvCategory.stopLoading();
             holder.binding.videoImage.stopLoading();
@@ -112,8 +125,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         if (videoList.size() == 0) {
 
             return 10;
-        } else {
+        } else if (!isLoading) {
             return videoList.size();
+        } else {
+            return videoList.size() + 10;
         }
     }
 }

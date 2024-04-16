@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.adapter.VideoAdapter;
 import com.example.myapplication.databinding.ActivityMainBinding;
@@ -16,6 +17,9 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private VideoViewModel viewModel;
     private VideoAdapter videoadapter;
+    int page = 1;
+    private int visibleThreshold = 2;
+    private boolean noData = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,11 +29,34 @@ public class MainActivity extends AppCompatActivity {
 
         prepareRecyclerView();
         viewModel = new ViewModelProvider(this).get(VideoViewModel.class);
-        viewModel.getPopularVideos();
+        viewModel.getPopularVideos(page);
 
         viewModel.observeVideoLiveData().observe(this, videoList -> {
-            videoadapter.setVideoList(videoList);
+            if (videoList.size() != 0) {
+                videoadapter.setVideoList(videoList);
+            } else {
+                noData = true;
+                videoadapter.setVideoListWithEnd();
+            }
 
+        });
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) binding.rvVideos.getLayoutManager();
+
+        binding.rvVideos.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!noData) {
+                    int totalItemCount = linearLayoutManager.getItemCount();
+                    int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (!videoadapter.isLoading() && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        videoadapter.loadMoreLoading();
+                        page++;
+                        viewModel.getPopularVideos(page);
+
+                    }
+                }
+            }
         });
     }
 

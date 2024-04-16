@@ -16,18 +16,19 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class VideoViewModel extends ViewModel {
-    private   MutableLiveData<List<ApiResult>> videoLiveData =
+    private MutableLiveData<List<ApiResult>> videoLiveData =
             new MutableLiveData();
+
     public LiveData<List<ApiResult>> observeVideoLiveData() {
         return videoLiveData;
     }
 
-    public void getPopularVideos() {
-        APIClient.getClient().getPopularVideos("1").enqueue(new Callback<List<ApiResult>>() {
+    public void getPopularVideos(int page) {
+        APIClient.getClient().getPopularVideos(String.valueOf(page)).enqueue(new Callback<List<ApiResult>>() {
             @Override
             public void onResponse(Call<List<ApiResult>> call, Response<List<ApiResult>> response) {
                 if (response.body() != null) {
-                   videoLiveData.setValue( response.body());
+                    videoLiveData.setValue(response.body());
                 } else {
                     return;
                 }

@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
+            <com.example.myapplication.customviews.LoadingImageView
                 android:id="@+id/videoImage"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
@@ -31,27 +31,27 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
+            <com.example.myapplication.customviews.LoadingTextView
                 android:id="@+id/videoName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:paddingBottom="10dp"
                 android:text="Hello"
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/videoImage" />
 
-            <TextView
+            <com.example.myapplication.customviews.LoadingTextView
                 android:id="@+id/tvCategory"
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:paddingBottom="10dp"
                 android:text="category"
                 android:textAlignment="center"
                 android:textColor="@color/black"

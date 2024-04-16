@@ -28,6 +28,16 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     private ArrayList<ApiResult> videoList = new ArrayList<>();
     private Context adapterContext;
 
+    private boolean isLoading = true;
+
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public void setLoading(boolean loading) {
+        isLoading = loading;
+    }
+
     public VideoAdapter(Context appcontext) {
         adapterContext = appcontext;
     }
@@ -35,6 +45,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     @SuppressLint("NotifyDataSetChanged")
     public void setVideoList(List<ApiResult> videoList) {
         this.videoList = new ArrayList<>(videoList);
+        isLoading = false;
         notifyDataSetChanged();
     }
 
@@ -50,44 +61,60 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(
-            VideoListLayoutBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
-            )
+                VideoListLayoutBinding.inflate(
+                        LayoutInflater.from(parent.getContext()), parent, false
+                )
         );
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Glide.with(holder.itemView)
-            .load("https:" + videoList.get(position).mainThumb)
-            .placeholder(com.example.myapplication.R.drawable.ic_launcher_background)
-            .listener(new RequestListener<Drawable>() {
-                @Override
-                public boolean onLoadFailed(GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    holder.binding.videoImage.setImageDrawable(
-                        ContextCompat.getDrawable(adapterContext, R.drawable.ic_launcher_background)
-                    );
-                    return false;
-                }
 
-                @Override
-                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    return false;
-                }
-            })
-            .into(holder.binding.videoImage);
-        holder.binding.videoName.setText(videoList.get(position).title);
+        if (isLoading()) {
+            holder.binding.videoImage.startLoading();
+            holder.binding.tvCategory.startLoading();
+            holder.binding.videoName.startLoading();
+        } else {
+            Glide.with(holder.itemView)
+                    .load("https:" + videoList.get(position).mainThumb)
+                    .placeholder(com.example.myapplication.R.drawable.ic_launcher_background)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            holder.binding.videoImage.setImageDrawable(
+                                    ContextCompat.getDrawable(adapterContext, R.drawable.ic_launcher_background)
+                            );
+                            return false;
+                        }
 
-        holder.binding.cardView.setOnClickListener(v -> {
-            Intent i = new Intent(adapterContext, DetailActivity.class);
-            i.putExtra(Utils.EXT_OBJ, videoList.get(position));
-            adapterContext.startActivity(i);
-        });
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
+                    .into(holder.binding.videoImage);
+            holder.binding.videoName.setText(videoList.get(position).title);
+            holder.binding.tvCategory.setText(videoList.get(position).category);
+            holder.binding.cardView.setOnClickListener(v -> {
+                Intent i = new Intent(adapterContext, DetailActivity.class);
+                i.putExtra(Utils.EXT_OBJ, videoList.get(position));
+                adapterContext.startActivity(i);
+            });
+            
+            holder.binding.tvCategory.stopLoading();
+            holder.binding.videoImage.stopLoading();
+            holder.binding.videoName.stopLoading();
+        }
     }
 
     @Override
     public int getItemCount() {
-        return videoList.size();
+        if (videoList.size() == 0) {
+
+            return 10;
+        } else {
+            return videoList.size();
+        }
     }
 }
 

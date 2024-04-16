@@ -16,7 +16,7 @@ public class APIClient {
                 .readTimeout(20, TimeUnit.SECONDS)
                 .writeTimeout(25, TimeUnit.SECONDS).build();
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://0.tcp.in.ngrok.io:17820/")
+                .baseUrl("http://0.tcp.in.ngrok.io:17313/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

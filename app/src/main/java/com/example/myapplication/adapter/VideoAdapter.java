@@ -100,7 +100,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                 i.putExtra(Utils.EXT_OBJ, videoList.get(position));
                 adapterContext.startActivity(i);
             });
-            
+
             holder.binding.tvCategory.stopLoading();
             holder.binding.videoImage.stopLoading();
             holder.binding.videoName.stopLoading();
